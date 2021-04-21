@@ -1,0 +1,14 @@
+[Unit]
+Description="Бот для сканирование на домашнем МФУ"
+After=network.target
+
+[Service]
+User=alexo
+Group=alexo
+WorkingDirectory=/srv/http/TGMyHomeScanBot/src
+ExecStart=/srv/http/TGMyHomeScanBot/bin/python run.py
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
