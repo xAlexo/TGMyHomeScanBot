@@ -27,7 +27,7 @@
    
     cp /srv/http/TGMyHomeScanBot/src/tg_my_home_scan_bot.service /etc/systemd/system
 
-7. Создайте фаил config
+7. Создайте фаил config.py
 
 
     # APP API ID полученный от телеграм
