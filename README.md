@@ -47,3 +47,5 @@
    
 
     sudo systemctl start tg_my_home_scan_bot
+
+9. Найдите своего бота и нажмите /start
