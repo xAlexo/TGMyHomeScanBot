@@ -21,6 +21,7 @@ async def test_default_all_correct(mocker: MockFixture):
     p_partial = mocker.patch(
         'commands.default.partial', return_value=m_partial)
     p_progress = mocker.patch('commands.default.progress')
+    mocker.patch('commands.default.ALLOW_IDS', frozenset([1]))
 
     await default(m)
 
@@ -54,4 +55,3 @@ async def test_default_all_correct(mocker: MockFixture):
     assert m.client.delete_messages.called
     assert 1 == m.client.delete_messages.call_args_list[0].args[0]
     assert m_msg is m.client.delete_messages.call_args_list[0].args[1]
-
