@@ -1,3 +1,4 @@
 -r production.txt
 
 pytest==6.2.3
+pytest_mock==3.5.1
