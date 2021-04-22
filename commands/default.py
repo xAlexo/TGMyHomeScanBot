@@ -3,13 +3,14 @@ from datetime import datetime
 from functools import partial
 from logging import getLogger
 
-from telethon import Button, TelegramClient
+from telethon import TelegramClient
 from telethon.errors import MessageNotModifiedError
 from telethon.events import NewMessage
 from telethon.tl.types import Message
 
 from config import ALLOW_IDS
 from contrib.ScanType import ScanType
+from contrib.default_buttons import buttons
 from use_cases.scan import scan
 
 last_update = datetime.utcnow()
@@ -36,21 +37,6 @@ async def default(event: NewMessage.Event):
     c: TelegramClient = event.client
 
     await event.delete()
-
-    buttons = [
-        [
-            Button.text('Серый 300'),
-            Button.text('Цветной 300'),
-        ],
-        [
-            Button.text('Серый 600'),
-            Button.text('Цветной 600'),
-        ],
-        [
-            Button.text('Серый 1200'),
-            Button.text('Цветной 1200'),
-        ]
-    ]
 
     if event.chat_id not in ALLOW_IDS:
         return await event.respond(
