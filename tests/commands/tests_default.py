@@ -1,7 +1,9 @@
+from unittest.mock import Mock
+
 from pytest_mock import MockFixture
 
 from commands.default import default
-from contrib.ScanType import ScanType
+from contrib.scan_type import ScanType
 
 
 async def test_default_all_correct(mocker: MockFixture):
@@ -52,5 +54,4 @@ async def test_default_all_correct(mocker: MockFixture):
     assert m.client.delete_messages.called
     assert 1 == m.client.delete_messages.call_args_list[0].args[0]
     assert m_msg is m.client.delete_messages.call_args_list[0].args[1]
-
 

@@ -9,7 +9,7 @@ from telethon.events import NewMessage
 from telethon.tl.types import Message
 
 from config import ALLOW_IDS
-from contrib.ScanType import ScanType
+from contrib.scan_type import ScanType
 from contrib.default_buttons import buttons
 from use_cases.scan import scan
 
