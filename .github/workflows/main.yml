@@ -29,7 +29,8 @@ jobs:
         python-version: 3.9
     - name: Create config.py
       run: |
-        echo "ALLOW_IDS = frozenset([])\nSCANNER = ''" > config.py
+        echo "ALLOW_IDS = frozenset([])" > config.py
+        echo "SCANNER = ''" >> config.py
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
