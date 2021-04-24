@@ -1,0 +1,5 @@
+[Path]
+PathModified=/srv/http/TGMyHomeScanBot/src/.git
+
+[Install]
+WantedBy=multi-user.target

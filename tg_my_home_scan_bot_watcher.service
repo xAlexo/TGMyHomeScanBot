@@ -1,0 +1,10 @@
+[Unit]
+Description="Следим и рестартуем бота"
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart tg_my_home_scan_bot.service
+
+[Install]
+WantedBy=multi-user.target
