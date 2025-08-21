@@ -1,16 +1,13 @@
-# Use Ubuntu as base image since it has good SANE support
-FROM ubuntu:22.04
+# Use Python 3.12 as base image
+FROM python:3.12
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Install system dependencies
+# Install system dependencies (SANE utils for scanner support)
 RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
     sane-utils \
     libsane1 \
     && rm -rf /var/lib/apt/lists/*
@@ -22,8 +19,8 @@ WORKDIR /app
 COPY requirements/production.txt requirements/production.txt
 
 # Upgrade pip and install Python dependencies
-RUN pip3 install --upgrade pip
-RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements/production.txt
+RUN pip install --upgrade pip
+RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r requirements/production.txt
 
 # Copy application code
 COPY . .
@@ -50,7 +47,7 @@ RUN echo "#!/bin/bash" > start.sh && \
     echo "cp config.py.template config.py" >> start.sh && \
     echo "" >> start.sh && \
     echo "# Start the bot" >> start.sh && \
-    echo "python3 run.py" >> start.sh && \
+    echo "python run.py" >> start.sh && \
     chmod +x start.sh
 
 # Expose no ports (bot connects to Telegram API)
