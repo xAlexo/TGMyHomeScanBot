@@ -30,7 +30,17 @@ ALLOW_IDS=YOUR_USER_ID_1,YOUR_USER_ID_2
 docker-compose up -d
 ```
 
-### Сборка Docker образа
+### Использование готового образа из GitHub Container Registry
+
+```bash
+# Последняя версия
+docker pull ghcr.io/xalexo/tgmyhomescanbot:latest
+
+# Или конкретная версия (если есть тэги)
+docker pull ghcr.io/xalexo/tgmyhomescanbot:v1.0.0
+```
+
+### Сборка Docker образа локально
 
 ```bash
 docker build -t tg-my-home-scan-bot .
@@ -38,6 +48,18 @@ docker build -t tg-my-home-scan-bot .
 
 ### Запуск контейнера
 
+```bash
+docker run -d \
+  --name tg-my-home-scan-bot \
+  -e TG_APP_ID=YOUR_APP_ID \
+  -e TG_API_HASH=YOUR_API_HASH \
+  -e TG_BOT_API_TOKEN=YOUR_TOKEN \
+  -e SCANNER=epson2:net:192.168.1.3 \
+  -e ALLOW_IDS=123456789,987654321 \
+  ghcr.io/xalexo/tgmyhomescanbot:latest
+```
+
+Или если вы собрали образ локально:
 ```bash
 docker run -d \
   --name tg-my-home-scan-bot \
@@ -103,3 +125,24 @@ docker stop tg-my-home-scan-bot
 - Поддерживает как сетевые, так и USB сканеры
 - Не требует установки Python зависимостей на хост-системе
 - Изолированная среда выполнения
+
+## GitHub Actions и автоматическая сборка
+
+Репозиторий настроен с GitHub Actions для автоматической сборки и публикации Docker образов:
+
+- **CI Workflow**: Автоматически тестирует код и проверяет сборку Docker образа при каждом push/PR
+- **Docker Publish Workflow**: Автоматически собирает и публикует Docker образы в GitHub Container Registry при:
+  - Push в ветку `main` (тэг `latest`)
+  - Создании тэга версии `v*` (тэги версий)
+
+### Использование опубликованных образов
+
+```bash
+# Последняя версия
+docker pull ghcr.io/xalexo/tgmyhomescanbot:latest
+
+# Конкретная версия (если есть релизы)
+docker pull ghcr.io/xalexo/tgmyhomescanbot:v1.0.0
+```
+
+Образы автоматически обновляются при изменениях в коде и доступны в [GitHub Container Registry](https://github.com/xAlexo/TGMyHomeScanBot/pkgs/container/tgmyhomescanbot).
