@@ -33,12 +33,20 @@ async def scan(scan_type: str, dpi: int, progress: callable):
             line += b
             if b != b'\r':
                 continue
+
             line = line.decode()
-            p = parse_progress.search(line)
-            if p:
+            if p := parse_progress.search(line):
                 p = float(p['p'])
                 await progress(f'{p: >6.2f}%')
+                continue
 
-            line = b''
+            if line.count('sane_read: Error during device I/O'):
+                raise ValueError('Ошибка сканирования!')
 
-        return fn
+            if line.count('no SANE devices found'):
+                raise ValueError('Сканер не найден')
+
+            getLogger('scan').debug(f'Scan output: {line.strip()}')
+
+        if process.returncode == 0:
+            return fn

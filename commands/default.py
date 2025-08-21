@@ -61,9 +61,9 @@ async def default(event: NewMessage.Event):
                 progress_callback=pf
             )
             await c.delete_messages(event.chat_id, msg)
-        except FileNotFoundError:
+        except (FileNotFoundError, ValueError) as e:
             return await event.client.edit_message(
-                event.chat_id, msg.id, 'Проблема со сканером')
+                event.chat_id, msg.id, f'Проблема со сканером: {e}')
     except (ValueError, KeyError) as e:
         getLogger().exception(e)
         await event.respond('Параметры не распознаны')
