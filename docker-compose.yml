@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
   tg-my-home-scan-bot:
-    build: .
-    # Alternative: use pre-built image
-    # image: tg-my-home-scan-bot:latest
+    # Use pre-built image from GitHub Container Registry
+    image: ghcr.io/xalexo/tgmyhomescanbot:latest
+    
+    # Alternative: build locally
+    # build: .
     
     environment:
       # Telegram API configuration (required)
