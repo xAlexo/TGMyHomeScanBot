@@ -20,6 +20,7 @@ async def scan(scan_type: str, dpi: int, progress: callable):
           f'--mode {scan_type} --resolution {dpi}dpi'
 
     if scan_lock.locked():
+        getLogger('scan').debug('Scan is already in progress')
         return False
 
     async with scan_lock:
@@ -48,5 +49,6 @@ async def scan(scan_type: str, dpi: int, progress: callable):
 
             getLogger('scan').debug(f'Scan output: {line.strip()}')
 
+        getLogger('scan').debug(f'Scan output: {process}')
         if process.returncode == 0:
             return fn
