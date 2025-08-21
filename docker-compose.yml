@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  tg-my-home-scan-bot:
+    build: .
+    # Alternative: use pre-built image
+    # image: tg-my-home-scan-bot:latest
+    
+    environment:
+      # Telegram API configuration (required)
+      - TG_APP_ID=YOUR_APP_ID_HERE
+      - TG_API_HASH=YOUR_API_HASH_HERE
+      - TG_BOT_API_TOKEN=YOUR_BOT_TOKEN_HERE
+      - TG_APP_TITLE=MyHomeScan
+      
+      # Scanner configuration (required)
+      # Example: epson2:net:192.168.1.3 or test:0 for testing
+      - SCANNER=YOUR_SCANNER_DEVICE_HERE
+      
+      # Access control (required)
+      # Comma-separated list of allowed Telegram user IDs
+      - ALLOW_IDS=YOUR_USER_ID_1,YOUR_USER_ID_2
+    
+    volumes:
+      # Optional: persist bot session data
+      - ./bot_data:/app/bot_data
+      # Optional: custom temp directory
+      - ./tmp:/tmp
+    
+    # If scanner is on host network
+    # network_mode: "host"
+    
+    # For USB scanners, add device access
+    # devices:
+    #   - /dev/bus/usb:/dev/bus/usb
+    
+    restart: unless-stopped

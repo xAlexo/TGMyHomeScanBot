@@ -1,0 +1,19 @@
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+.venv
+venv/
+env/
+/A1exo's My Home Scan Bot.session
+/config.py
+tests/
+requirements/test.txt
+*.md
+.gitignore
+tg_my_home_scan_bot*.service
+tg_my_home_scan_bot*.path
