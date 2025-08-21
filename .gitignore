@@ -1,4 +1,6 @@
 /A1exo's My Home Scan Bot.session
+*.session
+*.session-journal
 /config.py
 __pycache__/
 *.pyc
