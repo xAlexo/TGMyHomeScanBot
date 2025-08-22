@@ -1,4 +1,4 @@
-# Use Python 3.12 as base image
+# Use Python 3.12 as base image (Debian-based)
 FROM python:3.12
 
 # Set environment variables
@@ -6,11 +6,25 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Install system dependencies (SANE utils for scanner support)
-RUN apt-get update && apt-get install -y \
+# Install system dependencies (SANE utils + airscan + avahi/dbus for mDNS/WSD)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     sane-utils \
     libsane1 \
-    && rm -rf /var/lib/apt/lists/*
+    sane-airscan \
+    avahi-daemon \
+    dbus \
+    iputils-ping \
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+# Ensure SANE backends are enabled (add if missing)
+RUN set -eux; \
+    if ! grep -qE '^[[:space:]]*airscan[[:space:]]*$' /etc/sane.d/dll.conf; then \
+        echo "airscan" >> /etc/sane.d/dll.conf; \
+    fi; \
+    if ! grep -qE '^[[:space:]]*epson2[[:space:]]*$' /etc/sane.d/dll.conf; then \
+        echo "epson2" >> /etc/sane.d/dll.conf; \
+    fi
 
 # Create application directory
 WORKDIR /app
@@ -41,18 +55,27 @@ RUN echo "# Configuration template - set these environment variables" > config.p
     echo "# Access control" >> config.py.template && \
     echo "ALLOW_IDS = frozenset(map(int, os.environ['ALLOW_IDS'].split(',')))" >> config.py.template
 
-# Create startup script
-RUN echo "#!/bin/bash" > start.sh && \
-    echo "# Generate config.py from environment variables" >> start.sh && \
-    echo "cp config.py.template config.py" >> start.sh && \
-    echo "" >> start.sh && \
-    echo "# Start the bot" >> start.sh && \
-    echo "python run.py" >> start.sh && \
-    chmod +x start.sh
+# Create startup script (launch dbus+avahi, quick SANE self-check, then run bot)
+RUN echo "#!/bin/bash" > /app/start.sh && \
+    echo "set -euo pipefail" >> /app/start.sh && \
+    echo "" >> /app/start.sh && \
+    echo "# Generate config.py from environment variables" >> /app/start.sh && \
+    echo "cp -f /app/config.py.template /app/config.py" >> /app/start.sh && \
+    echo "" >> /app/start.sh && \
+    echo "# Start DBus (needed by avahi-daemon) and Avahi for mDNS/WS-Discovery" >> /app/start.sh && \
+    echo "mkdir -p /run/dbus" >> /app/start.sh && \
+    echo "dbus-daemon --system --fork || true" >> /app/start.sh && \
+    echo "avahi-daemon --no-drop-root --daemonize || true" >> /app/start.sh && \
+    echo "" >> /app/start.sh && \
+    echo "# Quick SANE discovery check (non-fatal)" >> /app/start.sh && \
+    echo "SANE_DEBUG_AIRSCAN=\${SANE_DEBUG_AIRSCAN:-0} scanimage -L || true" >> /app/start.sh && \
+    echo "" >> /app/start.sh && \
+    echo "# Start the bot" >> /app/start.sh && \
+    echo "exec python /app/run.py" >> /app/start.sh && \
+    chmod +x /app/start.sh
 
 # Expose no ports (bot connects to Telegram API)
-# Create volume for temporary files
-VOLUME ["/tmp"]
+VOLUME [\"/tmp\"]
 
 # Set the entrypoint
-ENTRYPOINT ["./start.sh"]
+ENTRYPOINT [\"/app/start.sh\"]
