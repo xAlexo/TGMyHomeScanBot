@@ -56,26 +56,26 @@ RUN echo "# Configuration template - set these environment variables" > config.p
     echo "ALLOW_IDS = frozenset(map(int, os.environ['ALLOW_IDS'].split(',')))" >> config.py.template
 
 # Create startup script (launch dbus+avahi, quick SANE self-check, then run bot)
-RUN echo "#!/bin/bash" > /app/start.sh && \
-    echo "set -euo pipefail" >> /app/start.sh && \
-    echo "" >> /app/start.sh && \
-    echo "# Generate config.py from environment variables" >> /app/start.sh && \
-    echo "cp -f /app/config.py.template /app/config.py" >> /app/start.sh && \
-    echo "" >> /app/start.sh && \
-    echo "# Start DBus (needed by avahi-daemon) and Avahi for mDNS/WS-Discovery" >> /app/start.sh && \
-    echo "mkdir -p /run/dbus" >> /app/start.sh && \
-    echo "dbus-daemon --system --fork || true" >> /app/start.sh && \
-    echo "avahi-daemon --no-drop-root --daemonize || true" >> /app/start.sh && \
-    echo "" >> /app/start.sh && \
-    echo "# Quick SANE discovery check (non-fatal)" >> /app/start.sh && \
-    echo "SANE_DEBUG_AIRSCAN=\${SANE_DEBUG_AIRSCAN:-0} scanimage -L || true" >> /app/start.sh && \
-    echo "" >> /app/start.sh && \
-    echo "# Start the bot" >> /app/start.sh && \
-    echo "exec python /app/run.py" >> /app/start.sh && \
-    chmod +x /app/start.sh
+RUN echo "#!/bin/bash" > start.sh && \
+    echo "set -euo pipefail" >> start.sh && \
+    echo "" >> start.sh && \
+    echo "# Generate config.py from environment variables" >> start.sh && \
+    echo "cp -f /app/config.py.template /app/config.py" >> start.sh && \
+    echo "" >> start.sh && \
+    echo "# Start DBus (needed by avahi-daemon) and Avahi for mDNS/WS-Discovery" >> start.sh && \
+    echo "mkdir -p /run/dbus" >> start.sh && \
+    echo "dbus-daemon --system --fork || true" >> start.sh && \
+    echo "avahi-daemon --no-drop-root --daemonize || true" >> start.sh && \
+    echo "" >> start.sh && \
+    echo "# Quick SANE discovery check (non-fatal)" >> start.sh && \
+    echo "SANE_DEBUG_AIRSCAN=\${SANE_DEBUG_AIRSCAN:-0} scanimage -L || true" >> start.sh && \
+    echo "" >> start.sh && \
+    echo "# Start the bot" >> start.sh && \
+    echo "exec python /app/run.py" >> start.sh && \
+    chmod +x start.sh
 
 # Expose no ports (bot connects to Telegram API)
 VOLUME ["/tmp"]
 
 # Set the entrypoint
-ENTRYPOINT ["/app/start.sh"]
+ENTRYPOINT ["./start.sh"]
