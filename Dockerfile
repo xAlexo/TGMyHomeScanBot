@@ -75,7 +75,7 @@ RUN echo "#!/bin/bash" > /app/start.sh && \
     chmod +x /app/start.sh
 
 # Expose no ports (bot connects to Telegram API)
-VOLUME [\"/tmp\"]
+VOLUME ["/tmp"]
 
 # Set the entrypoint
-ENTRYPOINT [\"/app/start.sh\"]
+ENTRYPOINT ["/app/start.sh"]
