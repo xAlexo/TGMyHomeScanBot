@@ -56,7 +56,6 @@ async def scan(scan_type: str, dpi: int, progress: callable):
             if p := parse_progress.search(line):
                 p = float(p['p'])
                 await progress(f'{p: >6.2f}%')
-                continue
 
             if line.count('sane_read: Error during device I/O'):
                 raise ValueError('Ошибка сканирования!')
