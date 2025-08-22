@@ -65,6 +65,7 @@ async def scan(scan_type: str, dpi: int, progress: callable):
                 raise ValueError('Сканер не найден')
 
             _log.debug(f'Scan output: {line.strip()}')
+            line = b''
 
         if process.returncode == 0:
             return fn
