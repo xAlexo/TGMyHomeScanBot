@@ -12,6 +12,21 @@ from config import SCANNER
 parse_progress = compile('Progress: {p}%')
 scan_lock = Lock()
 
+async def sane_list_devices():
+    cmd = '/usr/bin/scanimage --list-devices'
+    process: Process = await asyncio.create_subprocess_exec(
+        *shlex.split(cmd),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
+    )
+    out, err = await process.communicate()
+    if process.returncode != 0:
+        _log.error(f'Ошибка при получении списка устройств: {err.decode().strip()}')
+        return []
+
+    devices = out.decode().strip().split('\n')
+    return [device.strip() for device in devices if device.strip()]
+
 
 async def scan(scan_type: str, dpi: int, progress: callable):
     name = uuid4().hex
@@ -54,6 +69,5 @@ async def scan(scan_type: str, dpi: int, progress: callable):
             return fn
 
         out, err = await process.communicate()
-        _log.debug(f'Scan output: {out.decode().strip()}')
-        _log.debug(f'Scan error: {err.decode().strip()}')
+        _log.debug(f'Scan output: {out!r}, {err!r}')
         return False
