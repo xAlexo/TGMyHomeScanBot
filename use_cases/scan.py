@@ -1,6 +1,7 @@
 import asyncio
 import shlex
 from asyncio import Lock
+from asyncio.subprocess import Process
 from uuid import uuid4
 
 from loguru import logger as _log
@@ -24,7 +25,7 @@ async def scan(scan_type: str, dpi: int, progress: callable):
         return False
 
     async with scan_lock:
-        process = await asyncio.create_subprocess_exec(
+        process: Process = await asyncio.create_subprocess_exec(
             *shlex.split(cmd),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
@@ -49,6 +50,10 @@ async def scan(scan_type: str, dpi: int, progress: callable):
 
             _log.debug(f'Scan output: {line.strip()}')
 
-        _log.debug(f'Scan output: {process}')
         if process.returncode == 0:
             return fn
+
+        out, err = await process.communicate()
+        _log.debug(f'Scan output: {out.decode().strip()}')
+        _log.debug(f'Scan error: {err.decode().strip()}')
+        return False
