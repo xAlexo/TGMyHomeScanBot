@@ -29,6 +29,7 @@ async def sane_list_devices():
 
 
 async def scan(scan_type: str, dpi: int, progress: callable):
+    _log.debug(f'Scan type: {scan_type}, dpi: {dpi}, scanner: {SCANNER}')
     name = uuid4().hex
     fn = f'/tmp/{name}.png'
     cmd = f'/usr/bin/scanimage -d "{SCANNER}" ' \
