@@ -1,12 +1,12 @@
-from logging import getLogger
+import asyncio
+import shlex
+from asyncio import Lock
 from uuid import uuid4
 
-import shlex
-import asyncio
+from loguru import logger as _log
 from parse import compile
 
 from config import SCANNER
-from asyncio import Lock, sleep
 
 parse_progress = compile('Progress: {p}%')
 scan_lock = Lock()
@@ -20,7 +20,7 @@ async def scan(scan_type: str, dpi: int, progress: callable):
           f'--mode {scan_type} --resolution {dpi}dpi'
 
     if scan_lock.locked():
-        getLogger('scan').debug('Scan is already in progress')
+        _log.debug('Scan is already in progress')
         return False
 
     async with scan_lock:
@@ -47,8 +47,8 @@ async def scan(scan_type: str, dpi: int, progress: callable):
             if line.count('no SANE devices found'):
                 raise ValueError('Сканер не найден')
 
-            getLogger('scan').debug(f'Scan output: {line.strip()}')
+            _log.debug(f'Scan output: {line.strip()}')
 
-        getLogger('scan').debug(f'Scan output: {process}')
+        _log.debug(f'Scan output: {process}')
         if process.returncode == 0:
             return fn

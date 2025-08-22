@@ -1,18 +1,19 @@
 import asyncio
-from logging import getLogger
+
+from loguru import logger as _log
 
 from main import factory
 
-
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     client = factory(loop)
 
     try:
-        getLogger().info('Запуск бота')
+        _log.info('Запуск бота')
         client.run_until_disconnected()
     except Exception as e:
-        getLogger().exception(e)
+        _log.exception(e)
     finally:
         loop.stop()

@@ -1,19 +1,19 @@
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import partial
-from logging import getLogger
 
+from loguru import logger as _log
 from telethon import TelegramClient
 from telethon.errors import MessageNotModifiedError
 from telethon.events import NewMessage
 from telethon.tl.types import Message
 
 from config import ALLOW_IDS
-from contrib.scan_type import ScanType
 from contrib.default_buttons import buttons
+from contrib.scan_type import ScanType
 from use_cases.scan import scan
 
-last_update = datetime.utcnow()
+last_update = datetime.now(tz=timezone.utc)
 
 
 async def progress(event, msg, data, f=None):
@@ -21,7 +21,7 @@ async def progress(event, msg, data, f=None):
     c: TelegramClient = event.client
 
     with suppress(MessageNotModifiedError):
-        delta = (datetime.utcnow() - last_update).total_seconds()
+        delta = (datetime.now(tz=timezone.utc) - last_update).total_seconds()
         if delta > 1:
             if not f:
                 await c.edit_message(event.chat_id, msg,
@@ -30,7 +30,7 @@ async def progress(event, msg, data, f=None):
                 await c.edit_message(event.chat_id, msg,
                                      f'Выгрузка: {data / f * 100:>6.2f}%')
 
-            last_update = datetime.utcnow()
+            last_update = datetime.now(tz=timezone.utc)
 
 
 async def default(event: NewMessage.Event):
@@ -65,5 +65,5 @@ async def default(event: NewMessage.Event):
             return await event.client.edit_message(
                 event.chat_id, msg.id, f'Проблема со сканером: {e}')
     except (ValueError, KeyError) as e:
-        getLogger().exception(e)
+        _log.exception(e)
         await event.respond('Параметры не распознаны')
