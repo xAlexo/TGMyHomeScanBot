@@ -55,6 +55,10 @@ RUN echo "# Configuration template - set these environment variables" > config.p
     echo "# Access control" >> config.py.template && \
     echo "ALLOW_IDS = frozenset(map(int, os.environ['ALLOW_IDS'].split(',')))" >> config.py.template
 
+# Configure avahi to work in Docker
+RUN sed -i 's/#enable-dbus=yes/enable-dbus=yes/' /etc/avahi/avahi-daemon.conf && \
+    sed -i 's/#disallow-other-stacks=no/disallow-other-stacks=no/' /etc/avahi/avahi-daemon.conf
+
 # Create startup script (launch dbus+avahi, quick SANE self-check, then run bot)
 RUN echo "#!/bin/bash" > start.sh && \
     echo "set -euo pipefail" >> start.sh && \
@@ -62,12 +66,19 @@ RUN echo "#!/bin/bash" > start.sh && \
     echo "# Generate config.py from environment variables" >> start.sh && \
     echo "cp -f /app/config.py.template /app/config.py" >> start.sh && \
     echo "" >> start.sh && \
-    echo "# Start DBus (needed by avahi-daemon) and Avahi for mDNS/WS-Discovery" >> start.sh && \
+    echo "# Start DBus (needed by avahi-daemon)" >> start.sh && \
     echo "mkdir -p /run/dbus" >> start.sh && \
-    echo "dbus-daemon --system --fork || true" >> start.sh && \
-    echo "avahi-daemon --no-drop-root --daemonize || true" >> start.sh && \
+    echo "rm -f /var/run/dbus/pid" >> start.sh && \
+    echo "dbus-daemon --system --fork" >> start.sh && \
+    echo "sleep 1" >> start.sh && \
+    echo "" >> start.sh && \
+    echo "# Start Avahi for mDNS/WS-Discovery" >> start.sh && \
+    echo "rm -rf /var/run/avahi-daemon" >> start.sh && \
+    echo "avahi-daemon --daemonize --no-chroot" >> start.sh && \
+    echo "sleep 2" >> start.sh && \
     echo "" >> start.sh && \
     echo "# Quick SANE discovery check (non-fatal)" >> start.sh && \
+    echo "echo 'Scanning for devices...'" >> start.sh && \
     echo "SANE_DEBUG_AIRSCAN=\${SANE_DEBUG_AIRSCAN:-0} scanimage -L || true" >> start.sh && \
     echo "" >> start.sh && \
     echo "# Start the bot" >> start.sh && \

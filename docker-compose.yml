@@ -30,7 +30,7 @@ services:
       - ./tmp:/tmp
     
     # If scanner is on host network
-    # network_mode: "host"
+    network_mode: "host"
     
     # For USB scanners, add device access
     # devices:
