@@ -85,6 +85,24 @@ RUN echo "#!/bin/bash" > start.sh && \
     echo "exec python /app/run.py" >> start.sh && \
     chmod +x start.sh
 
+# Static import self-check for CI: writes a dummy config from the template and
+# imports main with CI-safe env values (no Telegram connection attempted).
+# ponytail: duplicates config shape from config.py.template — keep in sync if config keys change
+RUN echo "#!/bin/bash" > ci-check.sh && \
+    echo "set -euo pipefail" >> ci-check.sh && \
+    echo "" >> ci-check.sh && \
+    echo "# config.py.template reads os.environ at import time; provide CI-safe values" >> ci-check.sh && \
+    echo "export TG_APP_ID=0" >> ci-check.sh && \
+    echo "export TG_API_HASH=ci" >> ci-check.sh && \
+    echo "export TG_BOT_API_TOKEN=ci" >> ci-check.sh && \
+    echo "export TG_APP_TITLE=ci" >> ci-check.sh && \
+    echo "export SCANNER='test:0'" >> ci-check.sh && \
+    echo "export ALLOW_IDS=1" >> ci-check.sh && \
+    echo "" >> ci-check.sh && \
+    echo "cp -f /app/config.py.template /app/config.py" >> ci-check.sh && \
+    echo "python -c 'import main; print(\"main module OK\")'" >> ci-check.sh && \
+    chmod +x ci-check.sh
+
 # Expose no ports (bot connects to Telegram API)
 VOLUME ["/tmp"]
 

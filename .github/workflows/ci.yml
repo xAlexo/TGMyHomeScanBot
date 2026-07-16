@@ -26,16 +26,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements/test.txt
     
-    - name: Lint with flake8 (if available)
+    - name: Lint with flake8
       run: |
-        # Install flake8 if not present
-        pip install flake8 || true
+        pip install flake8
         # Stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    
+    - name: Create dummy config.py
+      run: |
+        cat > config.py << 'EOF'
+        # CI dummy config — real config is gitignored and provided at deploy time
+        TG_APP_ID = 0
+        TG_API_HASH = 'dummy'
+        TG_BOT_API_TOKEN = 'dummy'
+        TG_APP_TITLE = 'MyHomeScan'
+        SCANNER = 'test:0'
+        ALLOW_IDS = frozenset([1])
+        EOF
     
     - name: Test with pytest
       run: |
-        python -m pytest tests/ || true
+        python -m pytest tests/
 
   docker-test:
     runs-on: ubuntu-latest
@@ -46,5 +57,4 @@ jobs:
       run: docker build -t test-image .
     
     - name: Test Docker image structure
-      run: |
-        docker run --rm test-image --help || echo "Docker container can be created"
+      run: docker run --rm --entrypoint ./ci-check.sh test-image
