@@ -10,3 +10,4 @@ __pycache__/
 .omo/
 .worktrees/
 roadmap.md
+.env

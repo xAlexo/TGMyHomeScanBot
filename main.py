@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from loguru import logger as _log
 from telethon import TelegramClient
 from telethon.events import NewMessage
@@ -7,7 +9,11 @@ from use_cases.scan import sane_list_devices
 
 
 def factory(loop):
-    client = TelegramClient(TG_APP_TITLE, TG_APP_ID, TG_API_HASH, loop=loop)
+    session_dir = Path('/app/bot_data')
+    session_dir.mkdir(parents=True, exist_ok=True)
+    client = TelegramClient(
+        str(session_dir / TG_APP_TITLE), TG_APP_ID, TG_API_HASH, loop=loop)
+
 
     load_commands(client)
 

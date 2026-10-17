@@ -1,0 +1,15 @@
+services:
+  tg-my-home-scan-bot:
+    image: ghcr.io/xalexo/tgmyhomescanbot:latest
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      TG_APP_ID: ${TG_APP_ID:?Set TG_APP_ID in Dokploy}
+      TG_API_HASH: ${TG_API_HASH:?Set TG_API_HASH in Dokploy}
+      TG_BOT_API_TOKEN: ${TG_BOT_API_TOKEN:?Set TG_BOT_API_TOKEN in Dokploy}
+      TG_APP_TITLE: ${TG_APP_TITLE:-MyHomeScan}
+      SCANNER: ${SCANNER:?Set SCANNER in Dokploy}
+      ALLOW_IDS: ${ALLOW_IDS:?Set ALLOW_IDS in Dokploy}
+    volumes:
+      - /srv/docker/tg_my_home_scan/bot_data:/app/bot_data
+      - /srv/docker/tg_my_home_scan/tmp:/tmp
