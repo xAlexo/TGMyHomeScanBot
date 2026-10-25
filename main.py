@@ -12,7 +12,8 @@ def factory(loop):
     session_dir = Path('/app/bot_data')
     session_dir.mkdir(parents=True, exist_ok=True)
     client = TelegramClient(
-        str(session_dir / TG_APP_TITLE), TG_APP_ID, TG_API_HASH, loop=loop)
+        str(session_dir / TG_APP_TITLE), TG_APP_ID, TG_API_HASH, loop=loop,
+        connection_retries=None, retry_delay=30)
 
 
     load_commands(client)
